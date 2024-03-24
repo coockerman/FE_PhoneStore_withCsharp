@@ -1,23 +1,39 @@
 <template>
   <div class="container">
     <div>
-      <h2>Tất cả người dùng</h2>
-      <!-- Hiển thị danh sách người dùng -->
-      <ul>
-        <li v-for="user in users" :key="user.maUser">
-          {{ user.tenUser }} - {{ user.sdt }} - {{ user.diaChi }}
-          <!-- Nút xóa người dùng -->
-          <button @click="deleteUser(user.maUser)">Xóa</button>
-          <!-- Nút sửa người dùng -->
-          <button @click="editUser(user)">Sửa</button>
-        </li>
-      </ul>
+      <h2>Tất cả nhân viên</h2>
+      <!-- Hiển thị danh sách người dùng dưới dạng bảng -->
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tên nhân viên</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users" :key="user.maUser">
+            <td>{{ user.tenUser }}</td>
+            <td>{{ user.sdt }}</td>
+            <td>{{ user.diaChi }}</td>
+            <td>
+              <!-- Nút xóa người dùng -->
+              <button @click="deleteUser(user.maUser)" class="delete">
+                Xóa
+              </button>
+              <!-- Nút sửa người dùng -->
+              <button @click="editUser(user)" class="edit">Sửa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div>
       <!-- Form thêm/sửa người dùng -->
-      <h2 v-if="editMode">Sửa thông tin người dùng</h2>
-      <h2 v-else>Thêm người dùng</h2>
+      <h2 v-if="editMode">Sửa thông tin nhân viên</h2>
+      <h2 v-else>Thêm nhân viên</h2>
       <form @submit.prevent="editMode ? updateUser() : addUser()">
         <input
           type="text"
@@ -42,6 +58,7 @@
     </div>
   </div>
 </template>
+
   
   <script>
 import axios from "axios";
@@ -102,7 +119,7 @@ export default {
     },
     deleteUser(id) {
       axios
-        .delete(`https://localhost:7202/api/User/${id}`)
+        .put(`https://localhost:7202/api/User/${id}/ToggleVisibility`)
         .then((response) => {
           console.log(response.data);
           this.getAllUsers();

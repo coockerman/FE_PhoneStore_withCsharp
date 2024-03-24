@@ -3,15 +3,44 @@
     <div>
       <h2>Tất cả nhà cung cấp</h2>
       <!-- Hiển thị danh sách nhà cung cấp -->
-      <ul>
-        <li v-for="nhaCungCap in nhaCungCaps" :key="nhaCungCap.id">
-          {{ nhaCungCap.tenNCC }} - {{ nhaCungCap.sdt }} - {{ nhaCungCap.diaChi }}
-          <!-- Nút xóa nhà cung cấp -->
-          <button @click="deleteNhaCungCap(nhaCungCap.maNCC)">Xóa</button>
-          <!-- Nút sửa nhà cung cấp -->
-          <button @click="editNhaCungCap(nhaCungCap)">Sửa</button>
-        </li>
-      </ul>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Tên</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="nhaCungCap in nhaCungCaps" :key="nhaCungCap.id">
+              <!-- Tên nhà cung cấp -->
+              <td>{{ nhaCungCap.tenNCC }}</td>
+              <!-- Số điện thoại -->
+              <td>{{ nhaCungCap.sdt }}</td>
+              <!-- Địa chỉ -->
+              <td>{{ nhaCungCap.diaChi }}</td>
+              <!-- Nút xóa nhà cung cấp -->
+              <td>
+                <button
+                  @click="deleteNhaCungCap(nhaCungCap.maNCC)"
+                  class="btn btn-delete"
+                >
+                  Xóa
+                </button>
+                <!-- Nút sửa nhà cung cấp -->
+                <button
+                  @click="editNhaCungCap(nhaCungCap)"
+                  class="btn btn-edit"
+                >
+                  Sửa
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Form thêm/sửa nhà cung cấp -->
@@ -19,14 +48,36 @@
       <h2 v-if="editMode">Sửa thông tin nhà cung cấp</h2>
       <h2 v-else>Thêm nhà cung cấp</h2>
       <form @submit.prevent="editMode ? updateNhaCungCap() : addNhaCungCap()">
-        <input type="text" v-model="editedNhaCungCap.tenNCC" placeholder="Tên nhà cung cấp" required />
-        <input type="text" v-model="editedNhaCungCap.sdt" placeholder="Số điện thoại" required />
-        <input type="text" v-model="editedNhaCungCap.diaChi" placeholder="Địa chỉ" required />
-        <button type="submit">{{ editMode ? "Cập nhật" : "Thêm" }}</button>
+        <!-- Tên nhà cung cấp -->
+        <input
+          type="text"
+          v-model="editedNhaCungCap.tenNCC"
+          placeholder="Tên nhà cung cấp"
+          required
+        />
+        <!-- Số điện thoại -->
+        <input
+          type="text"
+          v-model="editedNhaCungCap.sdt"
+          placeholder="Số điện thoại"
+          required
+        />
+        <!-- Địa chỉ -->
+        <input
+          type="text"
+          v-model="editedNhaCungCap.diaChi"
+          placeholder="Địa chỉ"
+          required
+        />
+        <button type="submit" class="btn">
+          {{ editMode ? "Cập nhật" : "Thêm" }}
+        </button>
       </form>
     </div>
   </div>
 </template>
+
+
 
 <script>
 import axios from "axios";
@@ -87,13 +138,16 @@ export default {
     },
     deleteNhaCungCap(id) {
       axios
-        .delete(`https://localhost:7202/api/NCC/${id}`)
+        .put(`https://localhost:7202/api/NCC/${id}/toggleVisibility`)
         .then((response) => {
           console.log(response.data);
           this.getAllNhaCungCaps();
         })
         .catch((error) => {
-          console.error("Lỗi khi xóa nhà cung cấp", error);
+          console.error(
+            "Lỗi khi thay đổi trạng thái hiển thị nhà cung cấp",
+            error
+          );
         });
     },
     resetForm() {
@@ -108,79 +162,60 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .container {
+  margin: 20px auto;
   max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.table-container {
+  overflow-x: auto;
 }
 
-li {
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-li:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+.table th,
+.table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
 }
 
-button {
-  padding: 10px 20px;
-  margin: 1px;
+.table th {
+  background-color: #f2f2f2;
+}
+
+.btn {
+  padding: 8px 16px;
   cursor: pointer;
+  border: none;
+  border-radius: 4px;
   background-color: #007bff;
   color: #fff;
-  border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
 }
 
-button.delete {
-  background-color: #dc3545; /* Màu đỏ */
+.btn:hover {
+  background-color: #0056b3;
 }
 
-button.edit {
-  background-color: #28a745; /* Màu xanh lá cây */
+.btn-delete {
+  background-color: #ff4d4f; /* Màu đỏ */
+  color: #fff; /* Màu chữ là trắng */
 }
 
-button:hover {
-  background-color: #0056b3; /* Màu xanh dương sáng hơn khi hover */
+.btn-delete:hover {
+  background-color: #d93636; /* Màu khi di chuột vào */
 }
 
-input[type="text"] {
-  padding: 10px;
-  width: 100%;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  transition: border-color 0.3s ease;
+.btn-edit {
+  background-color: #52c41a; /* Màu xanh lá cây */
+  color: #fff; /* Màu chữ là trắng */
 }
 
-input[type="text"]:focus {
-  border-color: #007bff; /* Màu xanh dương */
-}
-
-form {
-  margin-top: 20px;
-}
-
-h2 {
-  margin-bottom: 20px;
-  font-size: 28px;
-  color: #333;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border-bottom: 2px solid #007bff; /* Màu xanh dương */
-  padding-bottom: 10px;
+.btn-edit:hover {
+  background-color: #389e0d; /* Màu khi di chuột vào */
 }
 </style>

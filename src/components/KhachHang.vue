@@ -2,65 +2,52 @@
   <div class="container">
     <div>
       <h2>Tất cả khách hàng</h2>
-      <ul>
-        <li v-for="khachHang in khachHangs" :key="khachHang.maKH">
-          {{ khachHang.tenKH }} - {{ khachHang.sdt }} -
-          {{ khachHang.gioiTinh }} -
-          {{ khachHang.diaChi }}
-          <button class="delete" @click="deleteKhachHang(khachHang.maKH)">
-            Delete
-          </button>
-          <button class="edit" @click="editKhachHang(khachHang)">Edit</button>
-        </li>
-      </ul>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Tên</th>
+              <th>Số điện thoại</th>
+              <th>Giới tính</th>
+              <th>Địa chỉ</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="khachHang in khachHangs" :key="khachHang.maKH">
+              <td>{{ khachHang.tenKH }}</td>
+              <td>{{ khachHang.sdt }}</td>
+              <td>{{ khachHang.gioiTinh }}</td>
+              <td>{{ khachHang.diaChi }}</td>
+              <td>
+                <button class="btn-delete" @click="deleteKhachHang(khachHang.maKH)">
+                  Xóa
+                </button>
+                <button class="btn-edit" @click="editKhachHang(khachHang)">
+                  Sửa
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div>
-      <h2 v-if="editMode">Sửa thông tin khách hàng</h2>
-      <h2 v-else>Thêm khách hàng</h2>
+      <h2>{{ editMode ? "Sửa thông tin khách hàng" : "Thêm khách hàng" }}</h2>
       <form @submit.prevent="editMode ? updateKhachHang() : addKhachHang()">
-        <input
-          type="text"
-          :value="editMode ? editedKhachHang.tenKH : newKhachHang.tenKH"
-          @input="
-            editMode
-              ? (editedKhachHang.tenKH = $event.target.value)
-              : (newKhachHang.tenKH = $event.target.value)
-          "
-          placeholder="Tên"
-          required
-        />
-        <input
-          type="text"
-          :value="editMode ? editedKhachHang.sdt : newKhachHang.sdt"
-          @input="
-            editMode
-              ? (editedKhachHang.sdt = $event.target.value)
-              : (newKhachHang.sdt = $event.target.value)
-          "
-          placeholder="Số điện thoại"
-          required
-        />
+        <input type="text" v-model="newKhachHang.tenKH" placeholder="Tên" required />
+        <input type="text" v-model="newKhachHang.sdt" placeholder="Số điện thoại" required />
 
-        <select v-model="selectedGender" required>
-          <option value="" disabled selected hidden>Chọn giới tính</option>
+        <select v-model="newKhachHang.gioiTinh" required>
+          <option value="" disabled hidden>Chọn giới tính</option>
           <option value="Nam">Nam</option>
           <option value="Nữ">Nữ</option>
         </select>
 
-        <input
-          type="text"
-          :value="editMode ? editedKhachHang.diaChi : newKhachHang.diaChi"
-          @input="
-            editMode
-              ? (editedKhachHang.diaChi = $event.target.value)
-              : (newKhachHang.diaChi = $event.target.value)
-          "
-          placeholder="Địa chỉ"
-          required
-        />
+        <input type="text" v-model="newKhachHang.diaChi" placeholder="Địa chỉ" required />
 
-        <button type="submit">{{ editMode ? "Update" : "Add" }}</button>
+        <button type="submit" class="btn">{{ editMode ? "Cập nhật" : "Thêm" }}</button>
       </form>
     </div>
   </div>
@@ -79,31 +66,8 @@ export default {
         gioiTinh: "",
         diaChi: "",
       },
-      editedKhachHang: {
-        maKH: null,
-        tenKH: "",
-        sdt: "",
-        gioiTinh: "",
-        diaChi: "",
-      },
       editMode: false,
     };
-  },
-  computed: {
-    selectedGender: {
-      get() {
-        return this.editMode
-          ? this.editedKhachHang.gioiTinh
-          : this.newKhachHang.gioiTinh;
-      },
-      set(value) {
-        if (this.editMode) {
-          this.editedKhachHang.gioiTinh = value;
-        } else {
-          this.newKhachHang.gioiTinh = value;
-        }
-      },
-    },
   },
   created() {
     this.getAllKhachHangs();
@@ -116,7 +80,7 @@ export default {
           this.khachHangs = response.data;
         })
         .catch((error) => {
-          console.error("Error fetching khach hangs", error);
+          console.error("Lỗi khi lấy danh sách khách hàng", error);
         });
     },
     addKhachHang() {
@@ -125,45 +89,48 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.getAllKhachHangs();
-          this.newKhachHang = { tenKH: "", sdt: "", gioiTinh: "", diaChi: "" };
+          this.resetForm();
         })
         .catch((error) => {
-          console.error("Error adding khach hang", error);
+          console.error("Lỗi khi thêm khách hàng", error);
         });
     },
     editKhachHang(khachHang) {
-      this.editedKhachHang = { ...khachHang };
-      this.editMode = true;
+      // Đặt dữ liệu của khách hàng vào biến newKhachHang để chỉnh sửa
+      this.newKhachHang = { ...khachHang };
+      this.editMode = true; // Chuyển sang chế độ sửa
     },
     updateKhachHang() {
       axios
-        .put(`https://localhost:7202/api/KhachHang_`, this.editedKhachHang)
+        .put(`https://localhost:7202/api/KhachHang_`, this.newKhachHang)
         .then((response) => {
           console.log(response.data);
           this.getAllKhachHangs();
-          this.editMode = false;
-          this.editedKhachHang = {
-            maKH: null,
-            tenKH: "",
-            sdt: "",
-            gioiTinh: "",
-            diaChi: "",
-          };
+          this.resetForm();
         })
         .catch((error) => {
-          console.error("Error updating khach hang", error);
+          console.error("Lỗi khi cập nhật khách hàng", error);
         });
     },
     deleteKhachHang(id) {
-      axios
-        .delete(`https://localhost:7202/api/KhachHang_/${id}`)
+    axios.put(`https://localhost:7202/api/KhachHang_/${id}/toggleVisibility`)
         .then((response) => {
-          console.log(response.data);
-          this.getAllKhachHangs();
+            console.log(response.data);
+            this.getAllKhachHangs();
         })
         .catch((error) => {
-          console.error("Error deleting khach hang", error);
+            console.error("Lỗi khi ẩn khách hàng", error);
         });
+},
+    resetForm() {
+      // Xóa dữ liệu trong form sau khi thêm hoặc sửa
+      this.newKhachHang = {
+        tenKH: "",
+        sdt: "",
+        gioiTinh: "",
+        diaChi: "",
+      };
+      this.editMode = false; // Chuyển về chế độ thêm mới
     },
   },
 };
@@ -259,4 +226,3 @@ h2 {
   padding-bottom: 10px;
 }
 </style>
-
