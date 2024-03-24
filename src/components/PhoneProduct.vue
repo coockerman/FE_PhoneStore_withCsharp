@@ -2,6 +2,17 @@
   <div class="container">
     <div>
       <h2>Tất cả điện thoại</h2>
+      <div class="sort-dropdown">
+      <label for="sort">Sắp xếp:</label>
+      <select v-model="sortBy" @change="sortItems">
+        <option value="name">Theo tên</option>
+        <option value="price">Theo giá</option>
+      </select>
+      <select v-model="sortOrder" @change="sortItems">
+        <option value="asc">Tăng dần</option>
+        <option value="desc">Giảm dần</option>
+      </select>
+    </div>
       <!-- Hiển thị danh sách điện thoại dưới dạng bảng -->
       <table class="table">
         <thead>
@@ -67,11 +78,15 @@
         <!-- Thêm dropdown cho nhà cung cấp -->
         <select v-model="editedPhone.nhaCungCapId" required>
           <option value="" disabled selected hidden>Chọn nhà cung cấp</option>
-          <option v-for="nhaCungCap in nhaCungCaps" :key="nhaCungCap.MaNCC" :value="nhaCungCap.tenNCC">
-            {{ nhaCungCap.tenNCC }} 
+          <option
+            v-for="nhaCungCap in nhaCungCaps"
+            :key="nhaCungCap.MaNCC"
+            :value="nhaCungCap.tenNCC"
+          >
+            {{ nhaCungCap.tenNCC }}
           </option>
         </select>
-        
+
         <button type="submit">{{ editMode ? "Cập nhật" : "Thêm" }}</button>
       </form>
     </div>
@@ -85,6 +100,7 @@ export default {
   data() {
     return {
       phones: [],
+      sortOrder: "asc",
       nhaCungCaps: [], // Danh sách nhà cung cấp
       editedPhone: {
         tenPhone: "",
@@ -174,6 +190,27 @@ export default {
         nhaCungCapId: "",
       };
     },
+    sortItems() {
+      if (this.sortBy === "name") {
+        this.phones.sort((a, b) => {
+          const nameA = a.tenPhone.toUpperCase();
+          const nameB = b.tenPhone.toUpperCase();
+          if (nameA < nameB) {
+            return this.sortOrder === "asc" ? -1 : 1;
+          }
+          if (nameA > nameB) {
+            return this.sortOrder === "asc" ? 1 : -1;
+          }
+          return 0;
+        });
+      } else if (this.sortBy === "price") {
+        if (this.sortOrder === "asc") {
+          this.phones.sort((a, b) => a.price - b.price);
+        } else {
+          this.phones.sort((a, b) => b.price - a.price);
+        }
+      }
+    },
   },
 };
 </script>
@@ -256,6 +293,17 @@ h2 {
   letter-spacing: 2px;
   border-bottom: 2px solid #007bff; /* Màu xanh dương */
   padding-bottom: 10px;
+}
+.sort-dropdown {
+  margin-bottom: 10px; /* Khoảng cách dưới */
+}
+
+/* Tùy chỉnh style cho dropdown */
+.sort-dropdown select {
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>
   
