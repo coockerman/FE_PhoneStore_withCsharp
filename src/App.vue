@@ -5,6 +5,8 @@
       <router-link to="/userMain">Quản lý nhân viên</router-link> |
       <router-link to="/phoneProduct">Quản lý phone</router-link> |
       <router-link to="/orderProduct">Quản lý đơn hàng</router-link> |
+      <router-link to="/ThongKe">Thống kê</router-link> 
+
 
   </div>
   <router-view />

@@ -38,9 +38,7 @@
                 >
                   Xóa
                 </button>
-                <button @click="editOrder(order)" class="btn btn-edit">
-                  Sửa
-                </button>
+                
               </td>
             </tr>
           </tbody>

@@ -4,6 +4,7 @@ import NhaCungCap from "../components/NhaCungCap.vue";
 import UserMain from "../components/UserMain.vue";
 import PhoneProduct from "../components/PhoneProduct.vue";
 import OrderProduct from "../components/OrderProduct.vue";
+import ThongKe from "../components/ChartComponent.vue";
 
 const routes = [
     {
@@ -30,6 +31,11 @@ const routes = [
       path: "/orderProduct",
       name: "OrderProduct",
       component: OrderProduct,
+    },
+    {
+      path: "/ThongKe",
+      name: "ThongKe",
+      component: ThongKe,
     }
   ];
   

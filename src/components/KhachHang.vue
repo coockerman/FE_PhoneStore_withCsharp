@@ -2,6 +2,13 @@
   <div class="container">
     <div>
       <h2>Tất cả khách hàng</h2>
+      <input
+        type="text"
+        v-model="searchPhoneNumber"
+        placeholder="Nhập số điện thoại..."
+        @input="searchKhachHang"
+      />
+      <button @click="getAllKhachHangs">Hiển thị tất cả</button>
       <div class="table-container">
         <table class="table">
           <thead>
@@ -20,7 +27,10 @@
               <td>{{ khachHang.gioiTinh }}</td>
               <td>{{ khachHang.diaChi }}</td>
               <td>
-                <button class="btn-delete" @click="deleteKhachHang(khachHang.maKH)">
+                <button
+                  class="btn-delete"
+                  @click="deleteKhachHang(khachHang.maKH)"
+                >
                   Xóa
                 </button>
                 <button class="btn-edit" @click="editKhachHang(khachHang)">
@@ -36,8 +46,18 @@
     <div>
       <h2>{{ editMode ? "Sửa thông tin khách hàng" : "Thêm khách hàng" }}</h2>
       <form @submit.prevent="editMode ? updateKhachHang() : addKhachHang()">
-        <input type="text" v-model="newKhachHang.tenKH" placeholder="Tên" required />
-        <input type="text" v-model="newKhachHang.sdt" placeholder="Số điện thoại" required />
+        <input
+          type="text"
+          v-model="newKhachHang.tenKH"
+          placeholder="Tên"
+          required
+        />
+        <input
+          type="text"
+          v-model="newKhachHang.sdt"
+          placeholder="Số điện thoại"
+          required
+        />
 
         <select v-model="newKhachHang.gioiTinh" required>
           <option value="" disabled hidden>Chọn giới tính</option>
@@ -45,9 +65,16 @@
           <option value="Nữ">Nữ</option>
         </select>
 
-        <input type="text" v-model="newKhachHang.diaChi" placeholder="Địa chỉ" required />
+        <input
+          type="text"
+          v-model="newKhachHang.diaChi"
+          placeholder="Địa chỉ"
+          required
+        />
 
-        <button type="submit" class="btn">{{ editMode ? "Cập nhật" : "Thêm" }}</button>
+        <button type="submit" class="btn">
+          {{ editMode ? "Cập nhật" : "Thêm" }}
+        </button>
       </form>
     </div>
   </div>
@@ -67,6 +94,7 @@ export default {
         diaChi: "",
       },
       editMode: false,
+      searchPhoneNumber: "",
     };
   },
   created() {
@@ -112,16 +140,23 @@ export default {
           console.error("Lỗi khi cập nhật khách hàng", error);
         });
     },
+    searchKhachHang() {
+      const searchQuery = this.searchPhoneNumber.toLowerCase(); // Chuyển đổi chuỗi nhập vào thành chữ thường
+      this.khachHangs = this.khachHangs.filter((khachHang) =>
+        khachHang.sdt.toLowerCase().includes(searchQuery)
+      );
+    },
     deleteKhachHang(id) {
-    axios.put(`https://localhost:7202/api/KhachHang_/${id}/toggleVisibility`)
+      axios
+        .put(`https://localhost:7202/api/KhachHang_/${id}/toggleVisibility`)
         .then((response) => {
-            console.log(response.data);
-            this.getAllKhachHangs();
+          console.log(response.data);
+          this.getAllKhachHangs();
         })
         .catch((error) => {
-            console.error("Lỗi khi ẩn khách hàng", error);
+          console.error("Lỗi khi ẩn khách hàng", error);
         });
-},
+    },
     resetForm() {
       // Xóa dữ liệu trong form sau khi thêm hoặc sửa
       this.newKhachHang = {

@@ -204,6 +204,7 @@ export default {
           return 0;
         });
       } else if (this.sortBy === "price") {
+        //sort theo giá
         if (this.sortOrder === "asc") {
           this.phones.sort((a, b) => a.price - b.price);
         } else {
